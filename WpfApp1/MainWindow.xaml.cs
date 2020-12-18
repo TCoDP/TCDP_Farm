@@ -81,12 +81,11 @@ namespace WpfApp1
                 }
             }
         }
-        // Обновляем значение правого операнда
         private void Update_RightOp()
         {
             int num1 = Int32.Parse(leftop);
             int num2 = Int32.Parse(rightop);
-            // И выполняем операцию
+
             switch (operation)
             {
                 case "+":
