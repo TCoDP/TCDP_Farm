@@ -52,25 +52,17 @@ namespace WpfApp1
             else
             {
                 // Если равно, то выводим результат операции
-                if (s == "=")
-                {
+                if (s == "=") {
                     Update_RightOp();
                     textBlock.Text += rightop;
                     operation = "";
-                }
-                // Очищаем поле и переменные
-                else if (s == "CLEAR")
-                {
+                } else if (s == "CLEAR") {
                     leftop = "";
                     rightop = "";
                     operation = "";
                     textBlock.Text = "";
-                }
-                // Получаем операцию
-                else
-                {
-                    // Если правый операнд уже имеется, то присваиваем его значение левому
-                    // операнду, а правый операнд очищаем
+                } else {
+
                     if (rightop != "")
                     {
                         Update_RightOp();
@@ -81,12 +73,11 @@ namespace WpfApp1
                 }
             }
         }
-        // Обновляем значение правого операнда
         private void Update_RightOp()
         {
             int num1 = Int32.Parse(leftop);
             int num2 = Int32.Parse(rightop);
-            // И выполняем операцию
+
             switch (operation)
             {
                 case "+":
