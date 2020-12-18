@@ -44,14 +44,10 @@ namespace WpfApp1
                 }
                 else
                 {
-                    // Иначе к правому операнду
                     rightop += s;
                 }
-            }
-            // Если было введено не число
-            else
-            {
-                // Если равно, то выводим результат операции
+            } else {
+
                 if (s == "=") {
                     Update_RightOp();
                     textBlock.Text += rightop;
