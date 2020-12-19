@@ -4,8 +4,8 @@
              xmlns:local="clr-namespace:WpfApp1"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <SolidColorBrush x:Key="solidGrayBrush"
-                         Color="Gray" />
+        <SolidColorBrush x:Key="buttonColor"
+                         Color="LightSteelBlue" />
         <SolidColorBrush x:Key="backColor"
                          Color="SteelBlue" />
     </Application.Resources>

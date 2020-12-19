@@ -6,8 +6,7 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="Navigation"
-        Height="450"
-        Width="800">
+        Height="450" Width="800">
     <Grid>
         <Grid.Resources>
             <Style TargetType="Grid">
@@ -19,13 +18,16 @@
                 <Setter Property="Margin" Value="30 10" />
             </Style>
             <Style TargetType="Button">
-                <Setter Property="Background" Value="LightSteelBlue" />
+                <Setter Property="Background" Value="{StaticResource buttonColor}" />
                 <Setter Property="Cursor" Value="Hand" />
                 <Setter Property="Margin" Value="10 5" />
             </Style>
             <Style TargetType="GridSplitter">
                 <Setter Property="Background" Value="White" />
                 <Setter Property="Cursor" Value="Arrow" />
+            </Style>
+            <Style x:Key="arrow" TargetType="{x:Type Image}">
+                <Setter Property="Source" Value="Resources/arrow.bmp" />
             </Style>
         </Grid.Resources>
 
@@ -89,7 +91,7 @@
                 Click="paginate_prew_Click">
             <StackPanel Orientation="Vertical"
                         VerticalAlignment="Center">
-                <Image Source="Resources/arrow.png"
+                <Image Style="{StaticResource arrow}"
                        RenderTransformOrigin=".5,.5">
                     <Image.RenderTransform>
                         <TransformGroup>
@@ -185,9 +187,11 @@
         <Button x:Name="paginate_last"
                 Grid.Column="9"
                 Grid.Row="1"
-                Grid.RowSpan="2" Click="paginate_last_Click">
-            <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                <Image Source="Resources/arrow.png" />
+                Grid.RowSpan="2"
+                Click="paginate_last_Click">
+            <StackPanel Orientation="Vertical"
+                        VerticalAlignment="Center">
+                <Image Style="{StaticResource arrow}" />
             </StackPanel>
         </Button>
         <!-- Содержимое раздела -->
