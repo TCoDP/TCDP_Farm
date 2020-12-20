@@ -78,11 +78,12 @@ namespace WpfApp1
                 "<StackPanel MaxHeight='330'>";
             List<Account> packof10 = db.Accounts.
                 Where(x => x.id > offset * 10 - 10 && x.id < offset * 10).ToList();
+            int i = 1;
             foreach (Account x in packof10)
             {
                 items += "<StackPanel Orientation='Horizontal'>" +
-                        $"<Expander x:Name='inpack{x.id}' Header='id:{x.id}; login:{x.Login}' >" +
-                            $"<TextBlock x:Name='text{x.id}' Text='password:{x.Password}' />" +
+                        $"<Expander x:Name='inpack{i}' Header='id:{x.id}; login:{x.Login}' >" +
+                            $"<TextBlock x:Name='text{i++}' Text='password:{x.Password}' />" +
                         "</Expander>" +
                         "</StackPanel>";
             }
