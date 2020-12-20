@@ -1,4 +1,4 @@
-﻿<Window x:Class="WpfApp1.MainWindow"
+<Window x:Class="WpfApp1.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -19,13 +19,16 @@
                 <Setter Property="Margin" Value="30 10" />
             </Style>
             <Style TargetType="Button">
-                <Setter Property="Background" Value="LightSteelBlue" />
+                <Setter Property="Background" Value="{StaticResource buttonColor}" />
                 <Setter Property="Cursor" Value="Hand" />
                 <Setter Property="Margin" Value="10 5" />
             </Style>
             <Style TargetType="GridSplitter">
                 <Setter Property="Background" Value="White" />
                 <Setter Property="Cursor" Value="Arrow" />
+            </Style>
+            <Style x:Key="arrow" TargetType="{x:Type Image}">
+                <Setter Property="Source" Value="Resources/arrow.png" />
             </Style>
         </Grid.Resources>
 
@@ -89,7 +92,7 @@
                 Click="paginate_prew_Click">
             <StackPanel Orientation="Vertical"
                         VerticalAlignment="Center">
-                <Image Source="Resources/arrow.png"
+                <Image Style="{StaticResource arrow}"
                        RenderTransformOrigin=".5,.5">
                     <Image.RenderTransform>
                         <TransformGroup>
@@ -106,100 +109,27 @@
                  Grid.Row="0"
                  Grid.RowSpan="4" >
             <!-- !!! -->
-            <ScrollViewer MaxHeight="330"
-                          VerticalScrollBarVisibility="Hidden">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Name="inpack1"
-                                   Text="1" />
-                        <Expander Header="">
-                            <TextBlock Text="Ключевые параметры" />
-                        </Expander>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Name="inpack2"
-                                   Text="2" />
-                        <Expander Header="">
-                            <TextBlock Text="Ключевые параметры" />
-                        </Expander>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Name="inpack3"
-                                   Text="3" />
-                        <Expander Header="">
-                            <TextBlock Text="Ключевые параметры" />
-                        </Expander>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Name="inpack4"
-                                   Text="4" />
-                        <Expander Header="">
-                            <TextBlock Text="Ключевые параметры" />
-                        </Expander>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Name="inpack5"
-                                   Text="5" />
-                        <Expander Header="">
-                            <TextBlock Text="Ключевые параметры" />
-                        </Expander>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Name="inpack6"
-                                   Text="6" />
-                        <Expander Header="">
-                            <TextBlock Text="Ключевые параметры" />
-                        </Expander>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Name="inpack7"
-                                   Text="7" />
-                        <Expander Header="">
-                            <TextBlock Text="Ключевые параметры" />
-                        </Expander>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Name="inpack8"
-                                   Text="8" />
-                        <Expander Header="">
-                            <TextBlock Text="Ключевые параметры" />
-                        </Expander>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Name="inpack9"
-                                   Text="9" />
-                        <Expander Header="">
-                            <TextBlock Text="Ключевые параметры" />
-                        </Expander>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Name="inpack10"
-                                   Text="10" />
-                        <Expander Header="">
-                            <TextBlock Text="Ключевые параметры" />
-                        </Expander>
-                    </StackPanel>
-                </StackPanel>
-            </ScrollViewer>
         </ListBox>
         <Button x:Name="paginate_last"
                 Grid.Column="9"
                 Grid.Row="1"
-                Grid.RowSpan="2" Click="paginate_last_Click">
-            <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                <Image Source="Resources/arrow.png" />
+                Grid.RowSpan="2"
+                Click="paginate_last_Click">
+            <StackPanel Orientation="Vertical"
+                        VerticalAlignment="Center">
+                <Image Style="{StaticResource arrow}" />
             </StackPanel>
         </Button>
         <!-- Содержимое раздела -->
 
-        <!-- 2 -->
-        <StackPanel x:Name="text6"
+        <!-- Навигация раздела -->
+        <StackPanel x:Name="another"
                    Grid.Column="2"
                    Grid.ColumnSpan="8"
                    Grid.Row="5" >
             <TextBlock Text="Навигация внутри раздела"
                        ToolTip="Навигация внутри раздела" />
         </StackPanel>
-        <!-- 2 -->
+        <!-- Навигация раздела -->
     </Grid>
 </Window>
