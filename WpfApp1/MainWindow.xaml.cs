@@ -88,6 +88,7 @@ namespace WpfApp1
             }
             items += "</StackPanel></ScrollViewer>";
             var UI = XamlReader.Parse(items) as UIElement;
+            
             main.Items.Add(UI);
         }
     }
