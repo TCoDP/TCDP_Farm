@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Navigation"
         Height="450"
-        Width="800" Icon="Icon1.ico">
+        Width="800">
     <Grid>
         <Grid.Resources>
             <Style TargetType="Grid">
@@ -37,22 +37,21 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="10*" />
-            <ColumnDefinition Width="70*"/>
-            <ColumnDefinition Width="79*" />
-            <ColumnDefinition Width="79*" />
-            <ColumnDefinition Width="80*" />
-            <ColumnDefinition Width="79*" />
-            <ColumnDefinition Width="79*" />
-            <ColumnDefinition Width="79*" />
-            <ColumnDefinition Width="79*" />
-            <ColumnDefinition Width="79*" />
-            <ColumnDefinition Width="79*" />
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
         <!-- nav -->
-        <StackPanel Grid.ColumnSpan="3"
-                    Grid.RowSpan="5" Margin="0,0,0,-0.25">
+        <StackPanel Grid.ColumnSpan="2"
+                    Grid.RowSpan="5">
             <TextBlock x:Name="Menu"
                        Grid.Row="0"
                        Text="Logo" />
@@ -76,18 +75,18 @@
         </StackPanel>
         <!-- nav -->
 
-        <GridSplitter Grid.Column="2"
+        <GridSplitter Grid.Column="1"
                       Grid.RowSpan="5"
                       ResizeDirection="Rows"
                       VerticalAlignment="Stretch"
-                      Width="3" Margin="0,0,0,-0.25" />
+                      Width="3" />
 
         <!-- Содержимое раздела -->
         <Button x:Name="paginate_prew"
-                Grid.Column="3"
+                Grid.Column="2"
                 Grid.Row="1"
                 Grid.RowSpan="2"
-                Click="paginate_prew_Click" Margin="10,5,10,4.75">
+                Click="paginate_prew_Click">
             <StackPanel Orientation="Vertical"
                         VerticalAlignment="Center">
                 <Image Source="Resources/arrow.png"
@@ -102,10 +101,10 @@
         </Button>
         <ListBox x:Name="main"
                  Background="{StaticResource backColor}"
-                 Grid.Column="4"
+                 Grid.Column="3"
                  Grid.ColumnSpan="6"
                  Grid.Row="0"
-                 Grid.RowSpan="5" Margin="0,0,0,83.75" >
+                 Grid.RowSpan="4" >
             <!-- !!! -->
             <ScrollViewer MaxHeight="330"
                           VerticalScrollBarVisibility="Hidden">
@@ -184,9 +183,9 @@
             </ScrollViewer>
         </ListBox>
         <Button x:Name="paginate_last"
-                Grid.Column="10"
+                Grid.Column="9"
                 Grid.Row="1"
-                Grid.RowSpan="2" Click="paginate_last_Click" Margin="10,5,10,4.75">
+                Grid.RowSpan="2" Click="paginate_last_Click">
             <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                 <Image Source="Resources/arrow.png" />
             </StackPanel>
@@ -195,9 +194,9 @@
 
         <!-- 2 -->
         <StackPanel x:Name="text6"
-                   Grid.Column="3"
+                   Grid.Column="2"
                    Grid.ColumnSpan="8"
-                   Grid.Row="4" Margin="0,0.25,0,-0.25" >
+                   Grid.Row="5" >
             <TextBlock Text="Навигация внутри раздела"
                        ToolTip="Навигация внутри раздела" />
         </StackPanel>

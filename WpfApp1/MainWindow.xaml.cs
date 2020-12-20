@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,34 +32,12 @@ namespace WpfApp1
         }
         private void M1_Click(object sender, RoutedEventArgs e)
         {
-            var process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = @"C:\TCoDP\TCDP_Farm\Launcher.exe",
-                    Arguments = "frosbolboocastio3808 c8B5h79sg9"
-                }
-            };
 
-            process.Start();
-            // while (!process.StandardOutput.EndOfStream)
-            // {
-            //string line = process.StandardOutput.ReadLine();
-            // }
         }
 
         private void M2_Click(object sender, RoutedEventArgs e)
         {
-            var process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = @"C:\TCoDP\TCDP_Farm\Launcher.exe",
-                    Arguments = "erprivicatgas2622 Slrs1o4tuai"
-                }
-            };
 
-            process.Start();
         }
 
         private void M3_Click(object sender, RoutedEventArgs e)
