@@ -65,6 +65,7 @@ namespace WpfApp1
         {
             showPack(++paginator);
         }
+
         private void showPack(int offset = 1)
         {
             main.Items.Clear();
@@ -76,19 +77,17 @@ namespace WpfApp1
                 "xmlns:mc='http://schemas.openxmlformats.org/markup-compatibility/2006'>" +
                 "<StackPanel MaxHeight='330'>";
             List<Account> packof10 = db.Accounts.
-                Where(x => x.id < offset * 10 && x.id > offset * 10 - 10).ToList();
-            int i = 1;
+                Where(x => x.id > offset * 10 - 10 && x.id < offset * 10).ToList();
             foreach (Account x in packof10)
             {
                 items += "<StackPanel Orientation='Horizontal'>" +
-                        $"<Expander x:Name='inpack{i}' Header='id:{x.id}; login:{x.Login}' >" +
-                            $"<TextBlock x:Name='text{i++}' Text='password:{x.Password}' />" +
+                        $"<Expander x:Name='inpack{x.id}' Header='id:{x.id}; login:{x.Login}' >" +
+                            $"<TextBlock x:Name='text{x.id}' Text='password:{x.Password}' />" +
                         "</Expander>" +
                         "</StackPanel>";
             }
             items += "</StackPanel></ScrollViewer>";
             var UI = XamlReader.Parse(items) as UIElement;
-            
             main.Items.Add(UI);
         }
     }
