@@ -127,8 +127,8 @@
                    Grid.Column="2"
                    Grid.ColumnSpan="8"
                    Grid.Row="5" >
-            <TextBlock Text="Навигация внутри раздела"
-                       ToolTip="Навигация внутри раздела" />
+            <TextBlock Text="Навигация"
+                       ToolTip="Навигация" />
         </StackPanel>
         <!-- Навигация раздела -->
     </Grid>
