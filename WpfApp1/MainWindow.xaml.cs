@@ -7,6 +7,7 @@ using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -28,6 +29,7 @@ namespace WpfApp1
     {
         AppContext db;
         static int paginator = 1;
+        List<Account> working_pack;
         public MainWindow()
         {
             InitializeComponent();
@@ -36,7 +38,22 @@ namespace WpfApp1
         }
         private void M1_Click(object sender, RoutedEventArgs e)
         {
+            foreach (Account x in working_pack)
+            {
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = @"C:\TCoDP\TCDP_Farm\Launcher.exe",
+                        UseShellExecute = false,
+                        WindowStyle = ProcessWindowStyle.Minimized,
+                        Arguments = $"\"{ x.Login }\" \"{ x.Password }\""
+                    }
+                };
 
+                process.Start();
+                Thread.Sleep(1000);
+            }
         }
 
         private void M2_Click(object sender, RoutedEventArgs e)
@@ -78,6 +95,7 @@ namespace WpfApp1
                 "<StackPanel MaxHeight='330'>";
             List<Account> packof10 = db.Accounts.
                 Where(x => x.id > offset * 10 - 10 && x.id < offset * 10).ToList();
+            working_pack = packof10;
             int i = 1;
             foreach (Account x in packof10)
             {
