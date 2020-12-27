@@ -59,13 +59,13 @@
                        Grid.Row="0"
                        Text="Logo" />
             <Button x:Name="add_accounts"
-                    Content="1"
+                    Content="Добавить"
                     Grid.Row="1"
                     Click="add_accounts_Click" />
-            <Button x:Name="M2"
-                    Content="2"
+            <Button x:Name="run_accounts"
+                    Content="Запустить"
                     Grid.Row="2"
-                    Click="M2_Click" />
+                    Click="run_accounts_Click" />
             <Button x:Name="M3"
                     Content="3"
                     Grid.Row="3"
@@ -126,10 +126,7 @@
         <StackPanel x:Name="another"
                    Grid.Column="2"
                    Grid.ColumnSpan="8"
-                   Grid.Row="5" >
-            <TextBlock Text="Навигация"
-                       ToolTip="Навигация" />
-        </StackPanel>
+                   Grid.Row="5" />
         <!-- Навигация раздела -->
     </Grid>
 </Window>

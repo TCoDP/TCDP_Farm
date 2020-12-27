@@ -42,11 +42,21 @@ namespace WpfApp1
         private void add_accounts_Click(object sender, RoutedEventArgs e)
         {
             addAccounts();
+            showPack(paginator);
         }
 
-        private void M2_Click(object sender, RoutedEventArgs e)
+        private void run_accounts_Click(object sender, RoutedEventArgs e)
         {
-
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = @"Launcher.exe",
+                    Arguments = "erprivicatgas2622 Slrs1o4tuai"
+                }
+            };
+            //MessageBox.Show(process.StartInfo.FileName);
+            process.Start();
         }
 
         private void M3_Click(object sender, RoutedEventArgs e)
@@ -75,7 +85,7 @@ namespace WpfApp1
         {
             main.Items.Clear();
             List<Account> packof10 = db.Accounts.
-                Where(x => x.id > offset * 10 - 10 && x.id < offset * 10).ToList();
+                Where(x => x.id > offset * 10 - 10 && x.id <= offset * 10).ToList();
             working_pack = packof10;
             int i = 1;
 
@@ -131,7 +141,7 @@ namespace WpfApp1
                 .Split(new string[] { "\n" }, StringSplitOptions.None))
             {
                 if (line.Length == 0) break;
-                string[] x = line.Split(':');
+                string[] x = line.Split(' ');
                 Account y = new Account();
                 y.Login = x[0];
                 y.Password = x[1];
@@ -161,5 +171,6 @@ namespace WpfApp1
             }
             /* Запись в бд */
         }
+
     }
 }
