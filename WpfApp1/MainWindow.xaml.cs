@@ -47,16 +47,21 @@ namespace WpfApp1
 
         private void run_accounts_Click(object sender, RoutedEventArgs e)
         {
-            var process = new Process
+            foreach (Account x in working_pack)
             {
-                StartInfo = new ProcessStartInfo
+                var process = new Process
                 {
-                    FileName = @"Launcher.exe",
-                    Arguments = "erprivicatgas2622 Slrs1o4tuai"
-                }
-            };
-            //MessageBox.Show(process.StartInfo.FileName);
-            process.Start();
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = @"Launcher.exe",
+                        UseShellExecute = false,
+                        Arguments = $"\"{ x.Login }\" \"{ x.Password }\""
+                    }
+                };
+
+                process.Start();
+                Thread.Sleep(1000);
+            }
         }
 
         private void M3_Click(object sender, RoutedEventArgs e)
