@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -30,6 +31,7 @@ namespace WpfApp1
     {
         AppContext db;
         static int paginator = 1;
+        List<Account> working_pack;
         public MainWindow()
         {
             InitializeComponent();
@@ -74,6 +76,7 @@ namespace WpfApp1
             main.Items.Clear();
             List<Account> packof10 = db.Accounts.
                 Where(x => x.id > offset * 10 - 10 && x.id < offset * 10).ToList();
+            working_pack = packof10;
             int i = 1;
 
             if (packof10.Count() == 0)
