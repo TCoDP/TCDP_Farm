@@ -11,7 +11,8 @@ namespace WpfApp1
         public int id { get; set; }
         private string login, password;
         private string rank, nickname;
-        private int timestamp, steamid64, lvl;
+        private int timestamp, lvl;
+        private long steamid64;
         private bool online;
         public string Login
         {
@@ -33,7 +34,7 @@ namespace WpfApp1
             get { return timestamp; }
             set { timestamp = value; }
         }
-        public int Steamid64
+        public long Steamid64
         {
             get { return steamid64; }
             set { steamid64 = value; }
@@ -61,7 +62,7 @@ namespace WpfApp1
             string password,
             bool online,
             int timestamp,
-            int steamid64,
+            long steamid64,
             string rank,
             int lvl,
             string nickname)

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Navigation"
+        Title="TCDP Farm"
         Height="450"
         Width="800">
     <Grid>
@@ -55,9 +55,7 @@
         <!-- nav -->
         <StackPanel Grid.ColumnSpan="2"
                     Grid.RowSpan="5">
-            <TextBlock x:Name="Menu"
-                       Grid.Row="0"
-                       Text="Logo" />
+            <Image Height="32" Source="Resources/logotip.png"/>
             <Button x:Name="add_accounts"
                     Content="Добавить"
                     Grid.Row="1"
