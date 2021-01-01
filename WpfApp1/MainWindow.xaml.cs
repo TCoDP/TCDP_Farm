@@ -1,42 +1,45 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
-using System.Data.SqlClient;
-using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Markup;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Gameloop.Vdf;
+using SteamAuth;
 
 namespace WpfApp1
 {
-    /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         AppContext db;
         static int paginator = 1;
         List<Account> working_pack;
+        static string STEAM = @"C:\Program Files (x86)\Steam\", 
+                    CSGO = @"steamapps\common\Counter-Strike Global Offensive\";
+
+        private Manifest manifest;
+        private SteamGuardAccount[] allAccounts;
+        private string SteamGuardCode;
+
         public MainWindow()
         {
             InitializeComponent();
             db = new AppContext();
             showPack(paginator);
+            try
+            {
+                this.manifest = Manifest.GetManifest();
+            }
+            catch (ManifestParseException)
+            {
+                MessageBox.Show("Unable to read your settings. Try restating SDA.", "Steam Desktop Authenticator");
+                this.Close();
+            }
         }
 
         private void add_accounts_Click(object sender, RoutedEventArgs e)
@@ -66,7 +69,16 @@ namespace WpfApp1
 
         private void M3_Click(object sender, RoutedEventArgs e)
         {
-
+            try
+            {
+                foreach (Process process in ((IEnumerable<Process>)Process.GetProcesses()).Where<Process>((Func<Process, bool>)(pr => pr.ProcessName.ToLower().Equals("steam"))))
+                    process.Kill();
+                foreach (Process process2 in ((IEnumerable<Process>)Process.GetProcesses()).Where<Process>((Func<Process, bool>)(pr => pr.ProcessName.Equals("Launcher"))))
+                    process2.Kill();
+            }
+            catch (Exception ex)
+            {
+            }
         }
 
         private void M4_Click(object sender, RoutedEventArgs e)
@@ -150,12 +162,77 @@ namespace WpfApp1
                 Account y = new Account();
                 y.Login = x[0];
                 y.Password = x[1];
-                /*y.Online = false;
-                y.Timestamp = i;
-                y.Steamid64 = i;
+                y.Steamid64 = 0;
+                y.Online = false;
+                y.Timestamp = 0;
                 y.Rank = "q";
                 y.Lvl = 1;
-                y.Nickname = "q";*/
+                y.Nickname = "q";
+                string loginusers = File.ReadAllText(STEAM + @"config\loginusers.vdf");//проверка на существование и ошибки 
+                dynamic volvo = VdfConvert.Deserialize(loginusers);//проверка на существование и ошибки 
+                foreach (dynamic ItemID in volvo.Value.Children())
+                {
+                    if (Convert.ToString(ItemID.Value.AccountName) == y.Login)
+                    {
+                        y.Steamid64 = Convert.ToInt64(ItemID.ToString().Split('"')[1]);
+                        y.Nickname = Convert.ToString(ItemID.Value.PersonaName);
+                        y.Timestamp = Convert.ToInt32(ItemID.Value.Timestamp.ToString());
+                    }
+                }
+
+                if (y.Steamid64 == 0)
+                {
+                    MessageBox.Show($"The account {y.Login} is missing in the file loginusers.vdf");
+                    allAccounts = manifest.GetAllAccounts();
+                    if (allAccounts.Length > 0)
+                    {   
+                        for (int j = 0; j < allAccounts.Length; j++)
+                        {
+                            SteamGuardAccount account = allAccounts[j];
+                            if (account.AccountName == y.Login)
+                                SteamGuardCode = account.GenerateSteamGuardCode();
+                        }
+                    }
+                    var process = new Process
+                    {
+                        StartInfo = new ProcessStartInfo
+                        {
+                            FileName = STEAM + "steam.exe",
+                            UseShellExecute = false,
+                            Arguments = $"-login { y.Login.Trim() } { y.Password.Trim() }",
+                            RedirectStandardOutput = true
+                        }
+                    };
+
+                    process.Start();
+                    Thread.Sleep(10000);
+                    process.Kill();
+
+                    loginusers = File.ReadAllText(STEAM + @"config\loginusers.vdf");//проверка на существование и ошибки 
+                    volvo = VdfConvert.Deserialize(loginusers);//проверка на существование и ошибки 
+                    foreach (dynamic ItemID in volvo.Value.Children())
+                    {
+                        if (Convert.ToString(ItemID.Value.AccountName) == y.Login)
+                        {
+                            y.Steamid64 = Convert.ToInt64(ItemID.ToString().Split('"')[1]);
+                            y.Nickname = Convert.ToString(ItemID.Value.PersonaName);
+                            y.Timestamp = Convert.ToInt32(ItemID.Value.Timestamp.ToString());
+                        }
+                    }
+                }
+
+                /*Создание всех нужных файлов и папок*/
+                string targetPath = STEAM + $"steam_{y.Timestamp}.exe";
+                File.Copy(STEAM + "steam.exe", targetPath, true);
+
+                DirectoryInfo sourceDir = new DirectoryInfo(@"C:\TCoDP\TCDP_Farm\WpfApp1\Resources\game");
+                string target = STEAM + CSGO + $"csgo_{y.Timestamp}";
+                Directory.CreateDirectory(target);
+                DirectoryInfo destinationDir = new DirectoryInfo(target);
+
+                CopyDirectory(sourceDir, destinationDir);
+                /*Создание всех нужных файлов и папок*/
+
                 forDB.Add(y);
                 //db.Accounts.Add(y);
                 //db.SaveChanges();
@@ -163,7 +240,7 @@ namespace WpfApp1
             }
 
             /* Запись в бд */
-            try
+           try
             {
                 db.Accounts.AddRange(forDB);
                 db.SaveChangesAsync();// .SaveChanges();
@@ -175,6 +252,24 @@ namespace WpfApp1
                 MessageBox.Show($"Error in line #{e.Message}");
             }
             /* Запись в бд */
+        }
+        static void CopyDirectory(DirectoryInfo source, DirectoryInfo destination)
+        {
+            if (!destination.Exists) destination.Create();
+
+            FileInfo[] files = source.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                file.CopyTo(Path.Combine(destination.FullName, file.Name), true);
+            }
+
+            DirectoryInfo[] dirs = source.GetDirectories();
+            foreach (DirectoryInfo dir in dirs)
+            {
+                string destinationDir = Path.Combine(destination.FullName, dir.Name);
+
+                CopyDirectory(dir, new DirectoryInfo(destinationDir));
+            }
         }
 
     }
