@@ -8,30 +8,41 @@
         Title="Navigation"
         Height="450"
         Width="800">
+    <Window.Resources>
+        <Style TargetType="Grid">
+            <Setter Property="Background" Value="{StaticResource backColor}"/>
+            <Setter Property="ShowGridLines" Value="False"/>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Padding" Value="30 10"/>
+        </Style>
+        <Style x:Key="h2" TargetType="TextBlock">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontStyle" Value="Italic"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Margin" Value="10 5"/>
+            <Setter Property="SelectedIndex" Value="0"/>
+        </Style>
+        <!--<Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type ComboBox}}">
+            <Setter Property="Margin" Value="0" />
+        </Style>-->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource buttonColor}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="10 5"/>
+        </Style>
+        <Style TargetType="GridSplitter">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+        <Style x:Key="arrow" TargetType="{x:Type Image}">
+            <Setter Property="Source" Value="Resources/arrow.png"/>
+        </Style>
+    </Window.Resources>
     <Grid>
-        <Grid.Resources>
-            <Style TargetType="Grid">
-                <Setter Property="Background" Value="{StaticResource backColor}" />
-                <Setter Property="ShowGridLines" Value="False" />
-            </Style>
-            <Style TargetType="TextBlock">
-                <Setter Property="TextAlignment" Value="Left" />
-                <Setter Property="Margin" Value="30 10" />
-            </Style>
-            <Style TargetType="Button">
-                <Setter Property="Background" Value="{StaticResource buttonColor}" />
-                <Setter Property="Cursor" Value="Hand" />
-                <Setter Property="Margin" Value="10 5" />
-            </Style>
-            <Style TargetType="GridSplitter">
-                <Setter Property="Background" Value="White" />
-                <Setter Property="Cursor" Value="Arrow" />
-            </Style>
-            <Style x:Key="arrow" TargetType="{x:Type Image}">
-                <Setter Property="Source" Value="Resources/arrow.png" />
-            </Style>
-        </Grid.Resources>
-
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition />
@@ -57,24 +68,50 @@
                     Grid.RowSpan="5">
             <TextBlock x:Name="Menu"
                        Grid.Row="0"
-                       Text="Logo" />
-            <Button x:Name="add_accounts"
-                    Content="Добавить"
-                    Grid.Row="1"
-                    Click="add_accounts_Click" />
-            <Button x:Name="run_accounts"
-                    Content="Запустить"
-                    Grid.Row="2"
-                    Click="run_accounts_Click" />
-            <Button x:Name="M3"
-                    Content="3"
-                    Grid.Row="3"
-                    Click="M3_Click" />
-            <Button x:Name="M4"
-                    Content="Свернуть меню"
+                       Text="ЛОГО"
+                       Style="{StaticResource h2}" />
+
+            <TextBlock Grid.Row="0"
+                       Text="СОРТИРОВКА"
+                       Style="{StaticResource h2}" />
+            <TextBlock Text="Онлайн"/>
+            <ComboBox x:Name="Online">
+                <TextBlock>Все</TextBlock>
+                <TextBlock>Только онлайн</TextBlock>
+                <TextBlock>Только оффлайн</TextBlock>
+            </ComboBox>
+            <TextBlock Text="Уровень"/>
+            <ComboBox x:Name="Lvl">
+                <TextBlock>Все</TextBlock>
+                <TextBlock>1-20</TextBlock>
+                <TextBlock>21+</TextBlock>
+            </ComboBox>
+            <TextBlock Text="Ранг"/>
+            <ComboBox x:Name="Rank">
+                <TextBlock>Все</TextBlock>
+                <TextBlock>Без ранга</TextBlock>
+                <TextBlock>Silver 1</TextBlock>
+                <TextBlock>Silver 2</TextBlock>
+                <TextBlock>Silver 3</TextBlock>
+                <TextBlock>Silver 4</TextBlock>
+                <TextBlock>Silver Elite</TextBlock>
+                <TextBlock>Silver Elite Master</TextBlock>
+                <TextBlock>Gold Nova 1</TextBlock>
+                <TextBlock>Gold Nova 2</TextBlock>
+                <TextBlock>Gold Nova 3</TextBlock>
+                <TextBlock>Gold Nova Master</TextBlock>
+                <TextBlock>Master Guardian 1</TextBlock>
+                <TextBlock>Master Guardian 2</TextBlock>
+                <TextBlock>Master Guardian Elite</TextBlock>
+                <TextBlock>Distinguished Master Guardian</TextBlock>
+                <TextBlock>Legendary Eagle</TextBlock>
+                <TextBlock>Supreme Master First Class</TextBlock>
+                <TextBlock>The Global Elite</TextBlock>
+            </ComboBox>
+            <Button x:Name="update"
+                    Content="Обновить"
                     Grid.Row="4"
-                    ToolTip="Свернуть меню"
-                    Click="M4_Click" />
+                    ToolTip="Получить список с учётом фильтров" Click="update_Click" />
         </StackPanel>
         <!-- nav -->
 
@@ -123,10 +160,41 @@
         <!-- Содержимое раздела -->
 
         <!-- Навигация раздела -->
-        <StackPanel x:Name="another"
-                   Grid.Column="2"
-                   Grid.ColumnSpan="8"
-                   Grid.Row="5" />
+        <StackPanel x:Name="filter"
+                    VerticalAlignment="Center"
+                    Grid.Column="2"
+                    Grid.ColumnSpan="8"
+                    Grid.Row="5"
+                    Orientation="Horizontal">
+            <Button x:Name="add_accounts"
+                    Content="Добавить"
+                    Grid.Row="1"
+                    Click="add_accounts_Click" />
+            <Button x:Name="run_accounts"
+                    Content="Запустить"
+                    Grid.Row="2"
+                    Click="run_accounts_Click" />
+            <Button x:Name="M3"
+                    Content="3"
+                    Grid.Row="3"
+                    Click="M3_Click" />
+            <Button x:Name="M4"
+                    Content="Свернуть меню"
+                    Grid.Row="4"
+                    ToolTip="Свернуть меню"
+                    Click="M4_Click" />
+            <!-- <StackPanel x:Name="Online">
+                <RadioButton GroupName="Online" Content="Online" />
+                <RadioButton GroupName="Online" Content="Offline" />
+                <RadioButton GroupName="Online" Content="All" IsChecked="True" />
+            </StackPanel>
+            <StackPanel x:Name="Lvl">
+                <RadioButton GroupName="Prime" Content="1-20" />
+                <RadioButton GroupName="Prime" Content="21+" />
+                <RadioButton GroupName="Prime" Content="All" IsChecked="True" />
+            </StackPanel> -->
+            
+        </StackPanel>
         <!-- Навигация раздела -->
     </Grid>
 </Window>
