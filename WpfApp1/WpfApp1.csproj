@@ -172,6 +172,7 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+    </ItemGroup>
  <ItemGroup>
     <Resource Include="Resources\logotip.png" />
   </ItemGroup>
