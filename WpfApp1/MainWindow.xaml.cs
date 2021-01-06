@@ -110,10 +110,6 @@ namespace WpfApp1
                         UseShellExecute = false,
                         Arguments = $"{ x.Login } { x.Password } { x.Timestamp } { SteamGuardCode } { (count*350)+20 }",
                         CreateNoWindow = false
-                        //UseShellExecute = false,
-                        Arguments = $"{ x.Login } { x.Password }"
-                        //FileName = @"F:\Programs\Steam\steam.exe",
-                        //Arguments = $"-login \"{x.Login.Trim()}\" \"{x.Password.Trim()}\" -applaunch 730 -w 640 -h 480 -x 20 -y 20"
                     }
                 };
 
