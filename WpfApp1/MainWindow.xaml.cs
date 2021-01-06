@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Markup;
 using Gameloop.Vdf;
 using SteamAuth;
+using System.Runtime.InteropServices;
 
 namespace WpfApp1
 {
@@ -24,7 +25,13 @@ namespace WpfApp1
 
         private Manifest manifest;
         private SteamGuardAccount[] allAccounts;
-        private string SteamGuardCode;
+        private string SteamGuardCode = "";
+        [DllImport("user32.dll")]
+        static extern short VkKeyScan(char ch);
+        [DllImport("user32.dll")]
+        static extern bool PostMessage(IntPtr hWnd, UInt32 Msg, int wParam, int lParam);
+        [DllImport("user32.dll")]
+        static extern bool SetForegroundWindow(IntPtr hWnd);
 
         public MainWindow()
         {
@@ -47,29 +54,44 @@ namespace WpfApp1
             addAccounts();
             showPack(paginator);
         }
-
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
         private void run_accounts_Click(object sender, RoutedEventArgs e)
         {
+            int count = 0;
             foreach (Account x in working_pack)
             {
+                allAccounts = manifest.GetAllAccounts();
+                if (allAccounts.Length > 0)
+                {
+                    for (int m = 0; m < allAccounts.Length; m++)
+                    {
+                        SteamGuardAccount account = allAccounts[m];
+                        if (account.AccountName == x.Login)
+                            SteamGuardCode = account.GenerateSteamGuardCode();
+                    }
+                }
+
                 var process = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = @"Launcher.exe",
                         UseShellExecute = false,
-                        Arguments = $"\"{ x.Login }\" \"{ x.Password }\""
+                        Arguments = $"{ x.Login } { x.Password } { x.Timestamp } { SteamGuardCode } { (count*350)+20 }",
+                        CreateNoWindow = false
                     }
                 };
 
                 process.Start();
-                Thread.Sleep(1000);
+                count++;
+                Thread.Sleep(35000);
             }
         }
 
         private void M3_Click(object sender, RoutedEventArgs e)
         {
-            try
+            /*try
             {
                 foreach (Process process in ((IEnumerable<Process>)Process.GetProcesses()).Where<Process>((Func<Process, bool>)(pr => pr.ProcessName.ToLower().Equals("steam"))))
                     process.Kill();
@@ -78,7 +100,7 @@ namespace WpfApp1
             }
             catch (Exception ex)
             {
-            }
+            }*/
         }
 
         private void M4_Click(object sender, RoutedEventArgs e)
@@ -182,17 +204,8 @@ namespace WpfApp1
 
                 if (y.Steamid64 == 0)
                 {
-                    MessageBox.Show($"The account {y.Login} is missing in the file loginusers.vdf");
-                    allAccounts = manifest.GetAllAccounts();
-                    if (allAccounts.Length > 0)
-                    {   
-                        for (int j = 0; j < allAccounts.Length; j++)
-                        {
-                            SteamGuardAccount account = allAccounts[j];
-                            if (account.AccountName == y.Login)
-                                SteamGuardCode = account.GenerateSteamGuardCode();
-                        }
-                    }
+                    //MessageBox.Show($"The account {y.Login} is missing in the file loginusers.vdf");
+                   
                     var process = new Process
                     {
                         StartInfo = new ProcessStartInfo
@@ -205,7 +218,33 @@ namespace WpfApp1
                     };
 
                     process.Start();
-                    Thread.Sleep(10000);
+                    Thread.Sleep(20000);
+                    allAccounts = manifest.GetAllAccounts();
+                    if (allAccounts.Length > 0)
+                    {
+                        for (int j = 0; j < allAccounts.Length; j++)
+                        {
+                            SteamGuardAccount account = allAccounts[j];
+                            if (account.AccountName == y.Login)
+                                SteamGuardCode = account.GenerateSteamGuardCode();
+                        }
+                    }
+                    if (SteamGuardCode != "")
+                    {
+                        char[] values = SteamGuardCode.ToCharArray();
+                        foreach (char letter in values)
+                        {
+                            SetForegroundWindow(process.MainWindowHandle);
+                            Thread.Sleep(200);
+                            PostMessage(process.MainWindowHandle, 0x0100, VkKeyScan(letter), 0);
+                        }
+                        Thread.Sleep(3000);
+                        SetForegroundWindow(process.MainWindowHandle);
+                        Thread.Sleep(200);
+                        PostMessage(process.MainWindowHandle, 0x0100, 0x0D, 0);
+                        SteamGuardCode = "";
+                    }
+                    Thread.Sleep(15000);
                     process.Kill();
 
                     loginusers = File.ReadAllText(STEAM + @"config\loginusers.vdf");//проверка на существование и ошибки 
@@ -225,7 +264,28 @@ namespace WpfApp1
                 string targetPath = STEAM + $"steam_{y.Timestamp}.exe";
                 File.Copy(STEAM + "steam.exe", targetPath, true);
 
-                DirectoryInfo sourceDir = new DirectoryInfo(@"C:\TCoDP\TCDP_Farm\WpfApp1\Resources\game");
+                DirectoryInfo userdataDir = new DirectoryInfo(STEAM + "userdata");
+                DirectoryInfo[] userdataDirs = userdataDir.GetDirectories();
+                foreach (DirectoryInfo dir in userdataDirs)
+                {
+                    if (dir.Name != "ac")
+                    {
+                        string localconfig = File.ReadAllText(dir.FullName + @"\config\localconfig.vdf");
+                        dynamic dvolvo = VdfConvert.Deserialize(localconfig);
+
+                        if (Convert.ToString(dvolvo.Value.friends.PersonaName) == y.Nickname)
+                        {
+                            Directory.CreateDirectory(dir.FullName + @"\730");
+                            Directory.CreateDirectory(dir.FullName + @"\730\local");
+                            Directory.CreateDirectory(dir.FullName + @"\730\local\cfg");
+                            DirectoryInfo userdata = new DirectoryInfo(@"C:\TCoDP\TCDP_Farm\WpfApp1\Resources\data\userdata");
+                            DirectoryInfo cfg = new DirectoryInfo(dir.FullName + @"\730\local\cfg");
+                            CopyDirectory(userdata, cfg);
+                        }
+                    }
+                }
+                
+                DirectoryInfo sourceDir = new DirectoryInfo(@"C:\TCoDP\TCDP_Farm\WpfApp1\Resources\data\game");
                 string target = STEAM + CSGO + $"csgo_{y.Timestamp}";
                 Directory.CreateDirectory(target);
                 DirectoryInfo destinationDir = new DirectoryInfo(target);
@@ -241,16 +301,16 @@ namespace WpfApp1
 
             /* Запись в бд */
            try
-            {
+           {
                 db.Accounts.AddRange(forDB);
                 db.SaveChangesAsync();// .SaveChanges();
                 MessageBox.Show(i + " accounts were successfully added.");
-            }
-            catch (Exception e)
-            {
+           }
+           catch (Exception e)
+           {
                 //MessageBox.Show("Error writing to the database.");
                 MessageBox.Show($"Error in line #{e.Message}");
-            }
+           }
             /* Запись в бд */
         }
         static void CopyDirectory(DirectoryInfo source, DirectoryInfo destination)
