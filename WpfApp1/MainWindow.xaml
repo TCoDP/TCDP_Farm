@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Navigation"
+        Title="TCDP Farm"
         Height="450"
         Width="800">
     <Window.Resources>
@@ -166,6 +166,7 @@
                     Grid.ColumnSpan="8"
                     Grid.Row="5"
                     Orientation="Horizontal">
+            <Image Height="32" Source="Resources/logotip.png"/>
             <Button x:Name="add_accounts"
                     Content="Добавить"
                     Grid.Row="1"
