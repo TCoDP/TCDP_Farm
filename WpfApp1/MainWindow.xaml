@@ -75,7 +75,7 @@
                        Text="СОРТИРОВКА"
                        Style="{StaticResource h2}" />
             <TextBlock Text="Онлайн"/>
-            <ComboBox x:Name="Online">
+            <ComboBox x:Name="Online" SelectedIndex="0">
                 <TextBlock>Все</TextBlock>
                 <TextBlock>Только онлайн</TextBlock>
                 <TextBlock>Только оффлайн</TextBlock>

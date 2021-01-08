@@ -101,27 +101,28 @@ namespace WpfApp1
                             SteamGuardCode = account.GenerateSteamGuardCode();
                     }
                 }
-
                 var process = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = @"Launcher.exe",
                         UseShellExecute = false,
-                        Arguments = $"{ x.Login } { x.Password } { x.Timestamp } { SteamGuardCode } { (count*350)+20 }",
+                        Arguments = $"{ x.Login } { x.Password } { x.Timestamp } { SteamGuardCode } {count}",
                         CreateNoWindow = false
                     }
                 };
 
                 process.Start();
+                getCodeAccount(manifest.GetAllAccounts(), x.Login.Trim(), Convert.ToString(x.Timestamp));
+
+                Thread.Sleep(5000);//Добавить проверку на существование открытого стима
                 count++;
-                Thread.Sleep(35000);
             }
         }
 
         private void M3_Click(object sender, RoutedEventArgs e)
         {
-            /*try
+            try
             {
                 foreach (Process process in ((IEnumerable<Process>)Process.GetProcesses()).Where<Process>((Func<Process, bool>)(pr => pr.ProcessName.ToLower().Equals("steam"))))
                     process.Kill();
@@ -130,12 +131,12 @@ namespace WpfApp1
             }
             catch (Exception ex)
             {
-            }*/
+            }
         }
 
         private void M4_Click(object sender, RoutedEventArgs e)
         {
-
+          
         }
 
         private void paginate_prew_Click(object sender, RoutedEventArgs e)
@@ -293,33 +294,9 @@ namespace WpfApp1
                     };
 
                     process.Start();
-                    Thread.Sleep(20000);
-                    allAccounts = manifest.GetAllAccounts();
-                    if (allAccounts.Length > 0)
-                    {
-                        for (int j = 0; j < allAccounts.Length; j++)
-                        {
-                            SteamGuardAccount account = allAccounts[j];
-                            if (account.AccountName == y.Login)
-                                SteamGuardCode = account.GenerateSteamGuardCode();
-                        }
-                    }
-                    if (SteamGuardCode != "")
-                    {
-                        char[] values = SteamGuardCode.ToCharArray();
-                        foreach (char letter in values)
-                        {
-                            SetForegroundWindow(process.MainWindowHandle);
-                            Thread.Sleep(200);
-                            PostMessage(process.MainWindowHandle, 0x0100, VkKeyScan(letter), 0);
-                        }
-                        Thread.Sleep(3000);
-                        SetForegroundWindow(process.MainWindowHandle);
-                        Thread.Sleep(200);
-                        PostMessage(process.MainWindowHandle, 0x0100, 0x0D, 0);
-                        SteamGuardCode = "";
-                    }
-                    Thread.Sleep(15000);
+                    getCodeAccount(manifest.GetAllAccounts(), y.Login.Trim());
+
+                    Thread.Sleep(5000);
                     process.Kill();
 
                     loginusers = File.ReadAllText(STEAM + @"config\loginusers.vdf");//проверка на существование и ошибки 
@@ -347,7 +324,6 @@ namespace WpfApp1
                     {
                         string localconfig = File.ReadAllText(dir.FullName + @"\config\localconfig.vdf");
                         dynamic dvolvo = VdfConvert.Deserialize(localconfig);
-
                         if (Convert.ToString(dvolvo.Value.friends.PersonaName) == y.Nickname)
                         {
                             Directory.CreateDirectory(dir.FullName + @"\730");
@@ -359,13 +335,7 @@ namespace WpfApp1
                         }
                     }
                 }
-                
-                DirectoryInfo sourceDir = new DirectoryInfo(@"C:\TCoDP\TCDP_Farm\WpfApp1\Resources\data\game");
-                string target = STEAM + CSGO + $"csgo_{y.Timestamp}";
-                Directory.CreateDirectory(target);
-                DirectoryInfo destinationDir = new DirectoryInfo(target);
 
-                CopyDirectory(sourceDir, destinationDir);
                 /*Создание всех нужных файлов и папок*/
 
                 forDB.Add(y);
@@ -407,7 +377,51 @@ namespace WpfApp1
             }
         }
 
+        private static IntPtr GetMainWindowHandle(string Timestamp)
+        {
+            bool check = false;
+            IntPtr WindowHandle = (IntPtr)0;
+            string ProcessName;
+            if (Timestamp == "0") ProcessName = "steam";
+            else ProcessName = "steam_"+ Timestamp;
+            foreach (Process clsProcess in Process.GetProcesses())
+            {
+                if (clsProcess.MainWindowTitle == "Steam Login" && clsProcess.ProcessName == ProcessName && Convert.ToString(clsProcess.MainWindowHandle) != "0")
+                {
+                    check = true;
+                    WindowHandle = clsProcess.MainWindowHandle;
+                    Thread.Sleep(2000);
+                    return WindowHandle;
+                }
+            }
+            if (check == true) return WindowHandle;
+            else return GetMainWindowHandle(Timestamp);
+        }
 
+       static void getCodeAccount(SteamGuardAccount[] allAccounts, string login, string Timestamp = "0")
+       {
+            string SteamGuardCode = "";
+            IntPtr WindowHandle = GetMainWindowHandle(Timestamp);
+            if (allAccounts.Length > 0)
+            {
+                for (int j = 0; j < allAccounts.Length; j++)
+                {
+                    SteamGuardAccount account = allAccounts[j];
+                    if (account.AccountName == login)
+                        SteamGuardCode = account.GenerateSteamGuardCode();
+                }
+            }
+            
+            if (SteamGuardCode != "")
+            {
+                Thread.Sleep(500);
+                Clipboard.SetText(SteamGuardCode);
+                PostMessage(WindowHandle, 0x0100, 0x0D, 0);
+                System.Windows.Forms.SendKeys.SendWait(SteamGuardCode);
+                Thread.Sleep(500);
+                System.Windows.Forms.SendKeys.SendWait("{ENTER}");
+            }
+        }
         //        private void ContextMenu_Checked(object sender, RoutedEventArgs e)
         //        {
         //        var item = e.OriginalSource as MenuItem;
