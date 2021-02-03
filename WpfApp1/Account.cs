@@ -9,11 +9,9 @@ namespace WpfApp1
     class Account
     {
         public int id { get; set; }
-        private string login, password;
-        private string rank, nickname;
-        private int timestamp, lvl;
+        private string login, password, nickname;
+        private int online, timestamp, rank, lvl;
         private long steamid64;
-        private bool online;
         public string Login
         {
             get { return login; }
@@ -24,7 +22,7 @@ namespace WpfApp1
             get { return password; }
             set { password = value; }
         }
-        public bool Online
+        public int Online
         {
             get { return online; }
             set { online = value; }
@@ -39,7 +37,7 @@ namespace WpfApp1
             get { return steamid64; }
             set { steamid64 = value; }
         }
-        public string Rank
+        public int Rank
         {
             get { return rank; }
             set { rank = value; }
@@ -60,10 +58,10 @@ namespace WpfApp1
         public Account(
             string login,
             string password,
-            bool online,
+            int online,
             int timestamp,
             long steamid64,
-            string rank,
+            int rank,
             int lvl,
             string nickname)
         {

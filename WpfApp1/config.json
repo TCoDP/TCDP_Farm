@@ -1,0 +1,11 @@
+{
+    "custom": {
+        "steam_path": "C:/Program Files (x86)/Steam/",
+        "cs_path": "steamapps/common/Counter-Strike Global Offensive/",
+        "mode": "15-15",
+        "maFiles_path": "steamapps/common/Counter-Strike Global Offensive/",
+        "sounds": "true",
+        "reconnect_delay": "1"
+    },
+    "clear_date": "01/01/2021"
+}

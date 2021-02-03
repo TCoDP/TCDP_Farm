@@ -8,6 +8,8 @@ namespace WpfApp1
 {
     public class Manifest
     {
+        public static string maDir = Config.GetConfig().Custom.MaFilesPath;
+
         [JsonProperty("encrypted")]
         public bool Encrypted { get; set; }
 
@@ -36,7 +38,7 @@ namespace WpfApp1
 
         public SteamGuardAccount[] GetAllAccounts()
         {
-            string maDir = @"C:\Users\tcdp\Desktop\Аккаунты\1_120\maFiles\";
+            //string maDir = @"C:\Users\tcdp\Desktop\Аккаунты\1_120\maFiles\";
             List<SteamGuardAccount> accounts = new List<SteamGuardAccount>();
             FileInfo[] Text = new DirectoryInfo(maDir).GetFiles();
             foreach (var entry in Text)
@@ -59,8 +61,8 @@ namespace WpfApp1
             }
 
             // Find config dir and manifest file
-            string maDir = @"C:\Users\tcdp\Desktop\Аккаунты\1_120\maFiles\";
-            string manifestFile = maDir + "manifest.json";
+            //string maDir = @"C:\Users\tcdp\Desktop\Аккаунты\1_120\maFiles\";
+            //string maDir + "manifest.json" = maDir + "manifest.json";
 
             // If there's no config dir, create it
             if (!Directory.Exists(maDir))
@@ -70,14 +72,14 @@ namespace WpfApp1
             }
 
             // If there's no manifest, throw exception
-            if (!File.Exists(manifestFile))
+            if (!File.Exists(maDir + "manifest.json"))
             {
                 throw new ManifestParseException();
             }
 
             try
             {
-                string manifestContents = File.ReadAllText(manifestFile);
+                string manifestContents = File.ReadAllText(maDir + "manifest.json");
                 _manifest = JsonConvert.DeserializeObject<Manifest>(manifestContents);
 
                 if (_manifest.Encrypted && _manifest.Entries.Count == 0)
@@ -111,7 +113,7 @@ namespace WpfApp1
             // Take a pre-manifest version and generate a manifest for it.
             if (scanDir)
             {
-                string maDir = @"C:\Users\tcdp\Desktop\Аккаунты\1_120\maFiles\";
+                //string maDir = @"C:\Users\tcdp\Desktop\Аккаунты\1_120\maFiles\";
                 if (Directory.Exists(maDir))
                 {
                     DirectoryInfo dir = new DirectoryInfo(maDir);
@@ -153,10 +155,11 @@ namespace WpfApp1
 
             return null;
         }
+
         private void RecomputeExistingEntries()
         {
             List<ManifestEntry> newEntries = new List<ManifestEntry>();
-            string maDir = @"C:\Users\tcdp\Desktop\Аккаунты\1_120\maFiles\";
+            //string maDir = @"C:\Users\tcdp\Desktop\Аккаунты\1_120\maFiles\";
 
             foreach (var entry in this.Entries)
             {
@@ -174,10 +177,11 @@ namespace WpfApp1
                 this.Encrypted = false;
             }
         }
+
         public bool Save()
         {
-            string maDir = @"C:\Users\tcdp\Desktop\Аккаунты\1_120\maFiles\";
-            string filename = maDir + "manifest.json";
+            //string maDir = @"C:\Users\tcdp\Desktop\Аккаунты\1_120\maFiles\";
+            //string filename = maDir + "manifest.json";
             if (!Directory.Exists(maDir))
             {
                 try
@@ -193,7 +197,7 @@ namespace WpfApp1
             try
             {
                 string contents = JsonConvert.SerializeObject(this);
-                File.WriteAllText(filename, contents);
+                /* File.WriteAllText(filename, contents); */
                 return true;
             }
             catch (Exception)
@@ -201,10 +205,12 @@ namespace WpfApp1
                 return false;
             }
         }
+
         public string PromptSetupPassKey(string initialPrompt = "Enter passkey, or hit cancel to remain unencrypted.")
         {
             return initialPrompt;
         }
+
         public class ManifestEntry
         {
             [JsonProperty("encryption_iv")]

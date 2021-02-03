@@ -1,6 +1,9 @@
 using Microsoft.Win32;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
@@ -13,6 +16,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Markup;
+using System.Xml.Serialization;
 using Gameloop.Vdf;
 using SteamAuth;
 using System.Runtime.InteropServices;
@@ -44,24 +48,35 @@ namespace WpfApp1
             "Supreme Master First Class",
             "The Global Elite"
         };
-        static string STEAM = @"C:\Program Files (x86)\Steam\", 
-                    CSGO = @"steamapps\common\Counter-Strike Global Offensive\";
+
+        public static string STEAM = "",// @"C:\Program Files (x86)\Steam\", 
+                    CSGO = "";// @"steamapps\common\Counter-Strike Global Offensive\";
 
         private Manifest manifest;
+        private static Config allSettings = Config.GetConfig();
         private SteamGuardAccount[] allAccounts;
         private string SteamGuardCode = "";
+
         [DllImport("user32.dll")]
         static extern short VkKeyScan(char ch);
+
         [DllImport("user32.dll")]
         static extern bool PostMessage(IntPtr hWnd, UInt32 Msg, int wParam, int lParam);
+
         [DllImport("user32.dll")]
         static extern bool SetForegroundWindow(IntPtr hWnd);
 
         public MainWindow()
         {
             InitializeComponent();
+
+            this.Loaded += MainWindow_Loaded;
+            this.Closing += MainWindow_Closing;
+
             db = new AppContext();
             showPack(paginator);
+            check_all_roots();
+
             try
             {
                 this.manifest = Manifest.GetManifest();
@@ -71,6 +86,17 @@ namespace WpfApp1
                 MessageBox.Show("Unable to read your settings. Try restating SDA.", "Steam Desktop Authenticator");
                 this.Close();
             }
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            STEAM = allSettings.Custom.SteamPath;
+            CSGO = allSettings.Custom.CsPath;
+        }
+
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            allSettings.Save(allSettings);
         }
 
         private void update_Click(object sender, RoutedEventArgs e)
@@ -84,17 +110,19 @@ namespace WpfApp1
             addAccounts();
             showPack(paginator);
         }
+
         [DllImport("user32.dll", SetLastError = true)]
         internal static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
+
         private void run_accounts_Click(object sender, RoutedEventArgs e)
         {
-            int count = 0;
+            int count = 0, m;
             foreach (Account x in working_pack)
             {
                 allAccounts = manifest.GetAllAccounts();
                 if (allAccounts.Length > 0)
                 {
-                    for (int m = 0; m < allAccounts.Length; m++)
+                    for (m = 0; m < allAccounts.Length; m++)
                     {
                         SteamGuardAccount account = allAccounts[m];
                         if (account.AccountName == x.Login)
@@ -108,7 +136,7 @@ namespace WpfApp1
                     {
                         FileName = @"Launcher.exe",
                         UseShellExecute = false,
-                        Arguments = $"{ x.Login } { x.Password } { x.Timestamp } { SteamGuardCode } { (count*350)+20 }",
+                        Arguments = $"{ x.Login } { x.Password } { x.Timestamp } { SteamGuardCode } { count*350+20 }",
                         CreateNoWindow = false
                     }
                 };
@@ -150,21 +178,75 @@ namespace WpfApp1
             showPack(++paginator);
         }
 
+        private void settings_Click(object sender, RoutedEventArgs e)
+        {
+            string x = settings_panel.Visibility.ToString();
+            settings_panel.Visibility = x == "Visible" ? Visibility.Hidden : Visibility.Visible;
+
+            //ConfigContent customSettings = allSettings.SettingsSet[1];
+            Config.Settings customSettings = allSettings.Custom;
+            steam_path.Text = (string)customSettings.SteamPath;
+            cs_path.Text = (string)customSettings.CsPath;
+            mode.Text = (string)customSettings.Mode;
+            maFiles_path.Text = (string)customSettings.MaFilesPath;
+            sounds.Text = customSettings.Sounds.ToString();
+            reconnect_delay.Text = customSettings.ReconnectDelay.ToString();
+            //MessageBox.Show(allSettings.ClearDate);
+        }
+
+        private void check_all_roots()
+        {
+            string ext = ".json";
+            if (File.Exists(allSettings.Custom.MaFilesPath + "manifest" + ext) == false)
+            {
+                MessageBox.Show("You need to change the way to your manifest file.");
+                allSettings.Custom.MaFilesPath = changeFile(allSettings.Custom.MaFilesPath, ext);
+                Manifest.maDir = allSettings.Custom.MaFilesPath;
+            }
+            ext = ".exe";
+            if (File.Exists(allSettings.Custom.SteamPath + "steam" + ext) == false)
+            {
+                MessageBox.Show("You need to change the way to your steam launcher.");
+                allSettings.Custom.SteamPath = changeFile(allSettings.Custom.SteamPath, ext);
+            }
+            if (File.Exists(allSettings.Custom.CsPath + "csgo" + ext) == false)
+            {
+                MessageBox.Show("You need to change the way to your csgo launcher.");
+                allSettings.Custom.CsPath = changeFile(allSettings.Custom.CsPath, ext);
+            }
+        }
+
+        private string changeFile(string def, string ext = ".txt")
+        {
+            OpenFileDialog file = new OpenFileDialog();
+            file.DefaultExt = ext;
+            file.Filter = $"Text files ({ext})|*{ext}";
+            if (file.ShowDialog() == false) return def;
+            string name = Path.GetDirectoryName(file.FileName);
+            name = name.Replace("\\", "/");
+            return $@"{name}/";
+        }
+
+        private void changeFolder(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog folder = new OpenFileDialog();
+            if (folder.ShowDialog() == false) return;
+            string name = folder.InitialDirectory;
+            MessageBox.Show(name);
+        }
+
         private List<Account> getPack(int offset = 1)
         {
-            int online = Online.SelectedIndex;
-            int lvl = Lvl.SelectedIndex;
-            int rank = Rank.SelectedIndex;
+            int lvl = Lvl.SelectedIndex,
+                rank = Rank.SelectedIndex;
 
             main.Items.Clear();
             List<Account> packof10 = db.Accounts
                 .Where(x => x.id > offset * 10 - 10 && x.id <= offset * 10)
-                .Where(x => x.Online != online > 0 ? online == 1 ? false : true : true)
-                .Where(x => x.Online != online > 0 ? online == 2 ? true : false : false)
-                //.Where(x => x.Online == online == 1 ? true : false)
-                //.Where(x => x.Online == online == 2 ? false : true)
+                //.Where(x => x.Online != online > 0 ? online == 1 ? false : true : true)
+                //.Where(x => x.Online != online > 0 ? online == 2 ? true : false : false)
                 .Where(x => x.Lvl == lvl)
-                //.Where(x => x.Rank == Rank.Text)
+                .Where(x => x.Rank == rank)
                 .ToList();
             working_pack = packof10;
             return packof10;
@@ -195,35 +277,15 @@ namespace WpfApp1
                 VerticalScrollBarVisibility='Hidden'
                 xmlns ='http://schemas.microsoft.com/winfx/2006/xaml/presentation'
                 xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
+                xmlns:fa='http://schemas.fontawesome.io/icons/'
                 xmlns:d='http://schemas.microsoft.com/expression/blend/2008'
                 xmlns:mc='http://schemas.openxmlformats.org/markup-compatibility/2006'>
                 <StackPanel MaxHeight='330'>";
             foreach (Account x in packof10)
             {
                 items += $"<StackPanel Orientation='Horizontal'>" +
-                        $"<TextBox x:Name='inpack{i}' IsReadOnly='True' Background='Transparent' Text='{x.id}) {x.Login}'>" +
-                        /*"<TextBlock.ContextMenu>" +
-                            "<ContextMenu>" +
-                                "<MenuItem Header='Copy' />" +
-                            "</ContextMenu>" +
-                        "</TextBlock.ContextMenu>" +
-                        "<x:Code><![CDATA[" +
-                            "MenuItem Item = new MenuItem();" +
-                            $"Item.Name = 'Copy{i}';" +
-                            "Item.Header = 'Copy';" +
-                            "Item.Click += MenuItem_Click;" +
-                            //$"Copy{i}.Click += Clipboard.SetText({working_pack[i-1].Login});" +
-                            "MenuItem ContextMenu = (MenuItem)this.MenuItem;" +
-                            "ContextMenu.Items.Add(Item);" +
-                        "}]]></x:Code> " +*/
-                        "</TextBox>" +
-                    $"<TextBlock x:Name='text{i++}' Text='password:******'>" +
-                        "<TextBlock.ContextMenu>" +
-                            "<ContextMenu>" +
-                                "<MenuItem Header='Copy' />" +
-                            "</ContextMenu>" +
-                        "</TextBlock.ContextMenu>" +
-                    "</TextBlock>" +
+                    $"<TextBox x:Name='inpack{i}' IsReadOnly='True' Background='Transparent' Text='{x.id}) {x.Login}'></TextBox>" +
+                    $"<TextBlock x:Name='text{i++}' Text='password:******'></TextBlock>" +
                 "</StackPanel>";
             }
 
@@ -232,11 +294,6 @@ namespace WpfApp1
             main.Items.Add(UI);
             paginate_last.IsEnabled = true;
         }
-        /*"<x:Code><![CDATA[" +
-            $"ContextMenu.Click += Copy_Click(this.Name);" +
-            "void Copy_Click(object sender, RoutedEventArgs e, string x){" +
-            "Clipboard.SetText(x);" +
-        "}]]></x:Code> " +*/
 
         private void addAccounts()
         {
@@ -260,9 +317,9 @@ namespace WpfApp1
                 y.Login = x[0];
                 y.Password = x[1];
                 y.Steamid64 = 0;
-                y.Online = false;
+                y.Online = 0;
                 y.Timestamp = 0;
-                y.Rank = "q";
+                y.Rank = 0;
                 y.Lvl = 1;
                 y.Nickname = "q";
                 string loginusers = File.ReadAllText(STEAM + @"config\loginusers.vdf");//проверка на существование и ошибки 
@@ -291,9 +348,9 @@ namespace WpfApp1
                             RedirectStandardOutput = true
                         }
                     };
-
                     process.Start();
                     Thread.Sleep(20000);
+
                     allAccounts = manifest.GetAllAccounts();
                     if (allAccounts.Length > 0)
                     {
@@ -335,7 +392,7 @@ namespace WpfApp1
                     }
                 }
 
-                /*Создание всех нужных файлов и папок*/
+                /* Создание всех нужных файлов и папок */
                 string targetPath = STEAM + $"steam_{y.Timestamp}.exe";
                 File.Copy(STEAM + "steam.exe", targetPath, true);
 
@@ -366,7 +423,7 @@ namespace WpfApp1
                 DirectoryInfo destinationDir = new DirectoryInfo(target);
 
                 CopyDirectory(sourceDir, destinationDir);
-                /*Создание всех нужных файлов и папок*/
+                /* Создание всех нужных файлов и папок */
 
                 forDB.Add(y);
                 //db.Accounts.Add(y);
@@ -383,11 +440,10 @@ namespace WpfApp1
            }
            catch (Exception e)
            {
-                //MessageBox.Show("Error writing to the database.");
                 MessageBox.Show($"Error in line #{e.Message}");
            }
-            /* Запись в бд */
         }
+
         static void CopyDirectory(DirectoryInfo source, DirectoryInfo destination)
         {
             if (!destination.Exists) destination.Create();
@@ -406,12 +462,5 @@ namespace WpfApp1
                 CopyDirectory(dir, new DirectoryInfo(destinationDir));
             }
         }
-
-
-        //        private void ContextMenu_Checked(object sender, RoutedEventArgs e)
-        //        {
-        //        var item = e.OriginalSource as MenuItem;
-        //        MessageBox.Show($"{item.Header} was clicked");
-        //    }
     }
 }

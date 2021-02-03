@@ -1,6 +1,7 @@
 <Window x:Class="WpfApp1.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
@@ -38,8 +39,21 @@
             <Setter Property="Background" Value="White"/>
             <Setter Property="Cursor" Value="Arrow"/>
         </Style>
-        <Style x:Key="arrow" TargetType="{x:Type Image}">
-            <Setter Property="Source" Value="Resources/arrow.png"/>
+        <Style x:Key="icon" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource backColor}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource backColor}"/>
+            <Setter Property="Margin" Value="10 5"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="IsReadOnly" Value="True"/>
+        </Style>
+        <Style x:Key="change" TargetType="StackPanel">
+            <Setter Property="Orientation" Value="Horizontal"/>
+        </Style>
+        <Style x:Key="change_fa" TargetType="fa:ImageAwesome">
+            <Setter Property="Icon" Value="FolderOpen"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Foreground" Value="Black"/>
         </Style>
     </Window.Resources>
     <Grid>
@@ -64,22 +78,12 @@
         </Grid.ColumnDefinitions>
 
         <!-- nav -->
-        <StackPanel Grid.ColumnSpan="2"
-                    Grid.RowSpan="5">
-            <TextBlock x:Name="Menu"
-                       Grid.Row="0"
-                       Text="ЛОГО"
-                       Style="{StaticResource h2}" />
+        <StackPanel Grid.ColumnSpan="2" Grid.RowSpan="5">
+            <Image Height="32" Source="Resources/logotip.png"/>
 
             <TextBlock Grid.Row="0"
                        Text="СОРТИРОВКА"
                        Style="{StaticResource h2}" />
-            <TextBlock Text="Онлайн"/>
-            <ComboBox x:Name="Online">
-                <TextBlock>Все</TextBlock>
-                <TextBlock>Только онлайн</TextBlock>
-                <TextBlock>Только оффлайн</TextBlock>
-            </ComboBox>
             <TextBlock Text="Уровень"/>
             <ComboBox x:Name="Lvl">
                 <TextBlock>Все</TextBlock>
@@ -111,7 +115,22 @@
             <Button x:Name="update"
                     Content="Обновить"
                     Grid.Row="4"
-                    ToolTip="Получить список с учётом фильтров" Click="update_Click" />
+                    ToolTip="Получить список аккаунтов с учётом фильтров"
+                    Click="update_Click" />
+            <Button x:Name="settings"
+                    Grid.Column="2"
+                    Grid.Row="1"
+                    Grid.RowSpan="2"
+                    Style="{StaticResource icon}"
+                    ToolTip="Открыть настройки"
+                    Click="settings_Click">
+                <StackPanel Orientation="Horizontal">
+                    <fa:ImageAwesome Icon="Cog"
+                                     Height="25"
+                                     HorizontalAlignment="Left"
+                                     Foreground="Black" />
+                </StackPanel>
+            </Button>
         </StackPanel>
         <!-- nav -->
 
@@ -121,22 +140,81 @@
                       VerticalAlignment="Stretch"
                       Width="3" />
 
+        <!-- Панель настроек -->
+        <StackPanel x:Name="settings_panel"
+                    Background="{StaticResource backColor}"
+                    Grid.Column="2"
+                    Grid.ColumnSpan="8"
+                    Grid.Row="0"
+                    Grid.RowSpan="5"
+                    Panel.ZIndex="1000"
+                    Visibility="Hidden">
+            <TextBlock Text="Настройки" Style="{StaticResource h2}" />
+            <StackPanel Orientation="Horizontal" Button.Click="changeFolder">
+                <TextBlock Text="путь до папки стим" />
+                <TextBox x:Name="steam_path" />
+                <Button ToolTip="Изменить">
+                    <StackPanel Style="{StaticResource change}">
+                        <fa:ImageAwesome Style="{StaticResource change_fa}" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="путь до кс" />
+                <TextBox x:Name="cs_path" />
+                <Button ToolTip="Изменить">
+                    <StackPanel Style="{StaticResource change}">
+                        <fa:ImageAwesome Style="{StaticResource change_fa}" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="список для выбора спуска режима" />
+                <TextBox x:Name="mode" Text="15-15 / 16-0" />
+                <Button ToolTip="Изменить">
+                    <StackPanel Style="{StaticResource change}">
+                        <fa:ImageAwesome Style="{StaticResource change_fa}" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="путь до всех maFiles" />
+                <TextBox x:Name="maFiles_path" />
+                <Button ToolTip="Изменить">
+                    <StackPanel Style="{StaticResource change}">
+                        <fa:ImageAwesome Style="{StaticResource change_fa}" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="статус для звукового сопровождения" />
+                <TextBox x:Name="sounds" />
+                <Button ToolTip="Изменить">
+                    <StackPanel Style="{StaticResource change}">
+                        <fa:ImageAwesome Style="{StaticResource change_fa}" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="сколько секунд нужно для реконнекта аккаунтов" />
+                <TextBox x:Name="reconnect_delay" />
+                <Button ToolTip="Изменить">
+                    <StackPanel Style="{StaticResource change}">
+                        <fa:ImageAwesome Style="{StaticResource change_fa}" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+
+
         <!-- Содержимое раздела -->
         <Button x:Name="paginate_prew"
                 Grid.Column="2"
                 Grid.Row="1"
                 Grid.RowSpan="2"
                 Click="paginate_prew_Click">
-            <StackPanel Orientation="Vertical"
-                        VerticalAlignment="Center">
-                <Image Style="{StaticResource arrow}"
-                       RenderTransformOrigin=".5,.5">
-                    <Image.RenderTransform>
-                        <TransformGroup>
-                            <RotateTransform Angle="180"/>
-                        </TransformGroup>
-                    </Image.RenderTransform>
-                </Image>
+            <StackPanel Orientation="Horizontal">
+                <fa:ImageAwesome Icon="ChevronLeft" Height="60" Foreground="Black"  />
             </StackPanel>
         </Button>
         <ListBox x:Name="main"
@@ -152,9 +230,8 @@
                 Grid.Row="1"
                 Grid.RowSpan="2"
                 Click="paginate_last_Click">
-            <StackPanel Orientation="Vertical"
-                        VerticalAlignment="Center">
-                <Image Style="{StaticResource arrow}" />
+            <StackPanel Orientation="Horizontal">
+                <fa:ImageAwesome Icon="ChevronRight" Height="60" Foreground="Black"  />
             </StackPanel>
         </Button>
         <!-- Содержимое раздела -->
@@ -166,35 +243,38 @@
                     Grid.ColumnSpan="8"
                     Grid.Row="5"
                     Orientation="Horizontal">
-            <Image Height="32" Source="Resources/logotip.png"/>
             <Button x:Name="add_accounts"
-                    Content="Добавить"
+                    Style="{StaticResource icon}"
                     Grid.Row="1"
-                    Click="add_accounts_Click" />
+                    ToolTip="Добавить новые аккаунты"
+                    Click="add_accounts_Click">
+                <StackPanel Orientation="Horizontal">
+                    <fa:ImageAwesome Icon="UserPlus" Height="30" Foreground="LightYellow"  />
+                </StackPanel>
+            </Button>
             <Button x:Name="run_accounts"
-                    Content="Запустить"
+                    Style="{StaticResource icon}"
                     Grid.Row="2"
-                    Click="run_accounts_Click" />
+                    ToolTip="Авторизовать и запустить все выбранные аккаунты"
+                    Click="run_accounts_Click">
+                <StackPanel Orientation="Horizontal">
+                    <fa:ImageAwesome Icon="Play" Height="30" Foreground="DarkSeaGreen"  />
+                </StackPanel>
+            </Button>
             <Button x:Name="M3"
-                    Content="3"
+                    Style="{StaticResource icon}"
                     Grid.Row="3"
-                    Click="M3_Click" />
+                    ToolTip="Остановить и деавторизовать все выбранные аккаунты"
+                    Click="M3_Click">
+                <StackPanel Orientation="Horizontal">
+                    <fa:ImageAwesome Icon="StopCircleOutline" Height="30" Foreground="IndianRed"  />
+                </StackPanel>
+            </Button>
             <Button x:Name="M4"
                     Content="Свернуть меню"
                     Grid.Row="4"
                     ToolTip="Свернуть меню"
                     Click="M4_Click" />
-            <!-- <StackPanel x:Name="Online">
-                <RadioButton GroupName="Online" Content="Online" />
-                <RadioButton GroupName="Online" Content="Offline" />
-                <RadioButton GroupName="Online" Content="All" IsChecked="True" />
-            </StackPanel>
-            <StackPanel x:Name="Lvl">
-                <RadioButton GroupName="Prime" Content="1-20" />
-                <RadioButton GroupName="Prime" Content="21+" />
-                <RadioButton GroupName="Prime" Content="All" IsChecked="True" />
-            </StackPanel> -->
-            
         </StackPanel>
         <!-- Навигация раздела -->
     </Grid>
