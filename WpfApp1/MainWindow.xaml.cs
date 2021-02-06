@@ -48,7 +48,6 @@ namespace WpfApp1
             "Supreme Master First Class",
             "The Global Elite"
         };
-
         public static string STEAM = "",// @"C:\Program Files (x86)\Steam\", 
                     CSGO = "";// @"steamapps\common\Counter-Strike Global Offensive\";
 
